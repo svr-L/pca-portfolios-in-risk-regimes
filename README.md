@@ -56,7 +56,7 @@ Metrics:
 
 Politis–Romano stationary block bootstrap:
 - N = 1000 simulations
-- Block length ≈ 35–40
+- Block length = 39
 
 PC1 (overall):
 
