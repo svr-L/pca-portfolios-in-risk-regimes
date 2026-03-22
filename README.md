@@ -169,7 +169,7 @@ In that sense, the project sits at the intersection of:
 
 ## Repository Structure
 
-* `PCA\_Portfolios\_in\_Risk\_Regimes.ipynb` — main notebook
+* `PCA_Portfolios_in_Risk_Regimes.ipynb` — main notebook
 * `requirements.txt`
 * `README.md`
 
