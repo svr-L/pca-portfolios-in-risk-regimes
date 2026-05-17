@@ -1,181 +1,126 @@
-# PCA Portfolios in Risk Regimes
-
-### Can regime awareness make principal portfolios investable and profitable?
+# regime-aware-core-satellite
 
 ## Overview
 
-This project studies whether principal components extracted from a panel of US tech equities can be treated as investable equity factors, and whether their risk-adjusted performance changes across volatility regimes.
+`regime-aware-core-satellite` studies investable PCA “principal portfolios” on US technology equities and develops a regime-aware allocation framework around the dominant principal portfolio (PC1).
 
-The framework combines:
+The project combines:
 
-* **Linear factor extraction:** correlation-PCA on daily equity returns
-* **Factor portfolio construction:** factor-mimicking principal portfolios
-* **Regime conditioning:** LOW / MID / HIGH states defined from an implied-volatility proxy
-* **Robust estimation:** flexible probabilities, shrinkage covariance, and walk-forward re-estimation
-* **Validation:** Politis–Romano stationary block bootstrap
-* **Implementability checks:** turnover, loading stability, and spread-based transaction-cost proxies
+- ML-based stress-regime identification from implied-volatility state variables,
+- a continuous IV-based stress-intensity signal,
+- portfolio-aware screening of multi-asset satellite candidates,
+- tangency-satellite construction,
+- and validation-selected non-linear de-risking from the PCA core into the satellite.
 
-## Research Question
+The objective is not pure return maximization. The goal is to improve the risk-adjusted profile of an investable PCA equity core under stressed market states while keeping the allocation logic explicit, systematic, and testable out of sample.
 
-Do higher-order principal portfolios become attractive in specific risk regimes, or does a simple buy-and-hold exposure to **PC1** remain the most robust investable choice once robustness and implementation are taken seriously?
+## Research question
 
-\---
+The central question is:
 
-## Main Findings
+> when does the investable PCA equity core remain worth holding, and when does it make sense to de-risk into a multi-asset satellite?
 
-### 1\) PC1 is the strongest baseline exposure
+Rather than treating PCA portfolios as static objects, this repository studies how their behaviour changes across stress regimes and how those state changes can be turned into systematic allocation rules.
 
-Across bootstrap validation and walk-forward testing, **PC1** emerges as the most robust buy-and-hold principal portfolio.
+## Current framework
 
-In the current bootstrap validation (**N = 1000**), PC1 delivers approximately:
+The current architecture is:
 
-* **42.6% median gross CAGR**
-* **1.59 median Sharpe ratio**
-* **7.22 median Martin ratio**
+1. **Investable PCA equity core**
+   - Build principal portfolios from US technology equities.
+   - Focus on the dominant principal portfolio (**PC1**) as the equity core.
 
-### 2\) Higher-order PCs are more regime-dependent
+2. **Stress regimes**
+   - Use ML-based regime identification built on implied-volatility state variables.
+   - Construct a continuous **stress-intensity** signal from IV information.
 
-Higher PCs can look attractive in selected regimes, especially on conditional risk-adjusted metrics, but they are materially less stable through time.
+3. **Satellite design**
+   - Screen a multi-asset universe in a portfolio-aware way rather than asset-by-asset.
+   - Build a **tangency satellite** from the retained subset.
 
-### 3\) Stability and implementability matter
+4. **Allocation rule**
+   - Allocate between the static PC1 core and the tangency satellite.
+   - Use validation-selected **non-linear de-risking** so the satellite can enter faster or slower than a linear mapping would imply.
 
-Walk-forward PCA shows a clear trade-off:
+## Why this repository exists
 
-* **PC1:** more stable loadings and lower turnover
-* **Higher PCs:** noisier rebalances and larger turnover spikes
+This repository is the broader home for the regime-aware allocation side of the project:
 
-This means that apparent performance improvements in higher PCs are harder to monetize in practice.
+- principal portfolios under stress regimes,
+- regime-conditioned behaviour of PC portfolios,
+- satellite construction,
+- and non-linear core-satellite allocation.
 
-### 4\) The core result survives more realistic evaluation choices
+It is meant to answer a broader portfolio-construction question than a pure overlay notebook or a pure signal notebook.
 
-The project now evaluates performance:
+## Methodological highlights
 
-* against a **historical risk-free proxy** (used for Sharpe, Sortino, Martin, and excess-return metrics)
-* net of **Corwin–Schultz spread-based implementation costs**
+- Investable PCA / principal portfolios
+- ML-based stress-regime identification
+- Continuous IV-based stress intensity
+- Portfolio-aware multi-asset screening
+- Tangency-satellite construction
+- Non-linear core-satellite allocation
+- Validation-window model selection
+- Frozen out-of-sample testing
+- Paired stationary-bootstrap inference
+- Net performance after Corwin–Schultz transaction-cost adjustments
 
-The main conclusion remains unchanged: **PC1 is still the most robust investable exposure**, while higher PCs remain more fragile and regime-sensitive.
+## Current headline result
 
-\---
+In the current retained frozen-OOS specification, the selected regime-aware core-satellite rule improves the risk-adjusted profile of the static PC1 core:
 
-## Methodology
+- **Sharpe:** +0.07
+- **Martin:** +0.16
+- **Max drawdown:** +7.4 percentage points improvement
+- **CAGR drag:** about 1.4 percentage points
 
-### Universe and frequency
+This is not an “alpha miracle” result. The project’s value is that it appears to deliver a cleaner **risk-adjusted** and **drawdown-controlled** allocation profile than the static core, at the cost of some CAGR.
 
-* **Universe:** US tech equities
-* **Frequency:** daily returns
+## Repository status
 
-### Factor construction
+This is an active research repository.
 
-* Correlation-based PCA on the equity return panel
-* Conversion of eigenvectors into **factor-mimicking principal portfolios**
-* Walk-forward re-estimation to avoid static in-sample weights
+The main open questions are not whether the framework “works at all”, but:
 
-### Regime definition
+- how robust the selected non-linearity is,
+- whether stress regimes can be refined further without over-complicating the signal,
+- whether the satellite universe should evolve further,
+- and how much complexity is actually rewarded out of sample.
 
-* Regimes classified as **LOW / MID / HIGH** using an implied-volatility state variable
+## What is inside
 
-### Risk and performance metrics
+Typical components in this repository include:
 
-* CAGR
-* Excess CAGR
-* Sharpe ratio
-* Sortino ratio
-* Calmar ratio
-* Martin ratio
-* Max drawdown
-* Turnover
-* Loading stability / cosine similarity
-
-### Validation
-
-* **Politis–Romano stationary block bootstrap**
-* **N = 1000** simulations
-* Dependency-aware resampling to assess robustness beyond the realized path
-
-### Implementation-cost layer
-
-* Asset-level **Corwin–Schultz** bid–ask spread estimation from daily high/low data
-* Conversion from full spread to **one-way spread-based cost proxy**
-* Aggregation of costs through the turnover of the underlying stock weights of each PC portfolio
-
-\---
-
-## Selected Results
-
-### Bootstrap validation
-
-For **PC1 (overall, gross)**, the stationary block bootstrap indicates strong and persistent performance, with median values around:
-
-|Metric|Median|
-|-|-:|
-|CAGR|42.6%|
-|Sharpe|1.59|
-|Martin|7.22|
-
-This supports the view that the strongest principal portfolio is not just an in-sample artifact.
-
-### Walk-forward results
-
-In walk-forward testing, **PC1** remains the cleanest investable baseline:
-
-* about **42.0% gross CAGR** overall
-* about **35.7% excess CAGR** overall
-* about **1.55 Sharpe** overall
-
-Spread-based costs modestly reduce performance, but do **not** overturn the ranking of PC1 as the most robust principal portfolio.
-
-\---
+- data download / preparation notebooks,
+- PCA / investable principal-portfolio construction,
+- regime-definition and stress-signal notebooks,
+- multi-asset satellite screening,
+- core-satellite allocation tests,
+- validation / frozen-OOS evaluation,
+- paired stationary-bootstrap inference.
 
 ## Interpretation
 
-This project is **not** a claim that higher PCs are useless.
+The project should be read as a **systematic portfolio-construction and de-risking framework**, not as a pure alpha strategy.
 
-Rather, it shows that:
+The main contribution is the combination of:
 
-* higher PCs can carry useful regime information,
-* but their attractiveness is conditional,
-* and the jump from “interesting backtest” to “investable factor” depends heavily on stability and turnover.
+- an investable PCA equity core,
+- explicit stress-state conditioning,
+- and a portfolio-aware satellite / allocation design.
 
-In that sense, the project sits at the intersection of:
+## Caveats
 
-* quantitative risk modelling,
-* factor investing,
-* and implementation-aware portfolio construction.
+- Results are sensitive to regime specification, satellite universe design, and non-linearity calibration.
+- The project trades some CAGR for improved risk-adjusted behaviour.
+- This repository is research code, not production investment advice.
 
-\---
+## Roadmap
 
-## Strategy Implications
+Likely next steps include:
 
-### Natural benchmark
-
-* **Buy \& Hold PC1**
-
-### Extensions under study
-
-* Regime-based rotation across principal portfolios
-* Cross-country or cross-universe PCA rotation
-* Risk overlays and portfolio constraints
-* Richer execution-cost modelling beyond spread-only proxies
-
-\---
-
-## Limitations
-
-* Corwin–Schultz costs should be interpreted as **spread-based implementation proxies**, not a full execution-cost model
-* Regime-conditional sub-sample metrics are informative diagnostically, but not all of them correspond directly to continuous investable strategies
-* Results remain sample-dependent and should be interpreted jointly with walk-forward and bootstrap evidence
-
-\---
-
-## Repository Structure
-
-* `PCA_Portfolios_in_Risk_Regimes.ipynb` — main notebook
-* `requirements.txt`
-* `README.md`
-
-\---
-
-## Author
-
-**Saverio Lauriola**
-
+- robustness checks around the selected non-linear allocation region,
+- further refinement of the stress signal,
+- better separation between “stress but compensated” and “stress and toxic” states,
+- and cleaner packaging of final retained specifications.
