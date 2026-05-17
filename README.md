@@ -61,53 +61,13 @@ The current evidence points to the following story:
 
 ## 4. Repository structure
 
-A README that does not explain the structure is useless, so here is the practical map.
-
-> Actual filenames may evolve, but the logical structure of the repository is:
+Actual filenames may evolve, but the logical structure of the repository is:
 
 ```text
-regime-aware-core-satellite/
-│
-├── notebooks/
-│   ├── data_download_and_cleaning.ipynb
-│   ├── pca_portfolios_construction.ipynb
-│   ├── regime_definition_and_stress_signal.ipynb
-│   ├── satellite_screening.ipynb
-│   ├── core_satellite_allocation.ipynb
-│   ├── validation_and_frozen_oos.ipynb
-│   └── bootstrap_inference.ipynb
-│
-├── src/
-│   ├── data/
-│   │   ├── loaders.py
-│   │   └── cleaning.py
-│   ├── pca/
-│   │   ├── principal_portfolios.py
-│   │   └── investable_weights.py
-│   ├── regimes/
-│   │   ├── iv_state.py
-│   │   ├── regime_selection.py
-│   │   └── stress_signal.py
-│   ├── satellite/
-│   │   ├── screening.py
-│   │   ├── tangency.py
-│   │   └── allocation.py
-│   ├── costs/
-│   │   └── corwin_schultz.py
-│   ├── metrics/
-│   │   ├── performance.py
-│   │   └── bootstrap.py
-│   └── utils/
-│       └── plotting.py
-│
-├── figures/
-├── results/
+│── regime-aware-core-satellite.pynb
 ├── README.md
 └── requirements.txt
 ```
-
-Even if the code is still notebook-heavy, this is the conceptual layout the project follows.
-
 ---
 
 ## 5. Data and investable universe
@@ -383,10 +343,6 @@ The expected workflow is:
 7. run validation and frozen-OOS allocation tests,
 8. evaluate with bootstrap-based paired inference.
 
-As the repository is cleaned further, a more explicit execution guide will be added.
+As the repository grows- further, a more explicit execution guide will be added.
 
 ---
-
-## 16. Short description (for GitHub “About”)
-
-**Regime-aware core-satellite allocation on an investable PCA equity core, combining ML-based stress regimes, portfolio-aware multi-asset satellite screening, and non-linear de-risking.**
